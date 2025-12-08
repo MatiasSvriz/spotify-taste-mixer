@@ -31,20 +31,22 @@ export default function Dashboard() {
       <FavoritesPanel />
 
       <div className="p-6 space-y-8">
-        <h1 className="text-3xl font-bold">Spotify Taste Mixer</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          {/* AGORA EL WIDGET FUNCIONA */}
           <ArtistWidget 
             selectedItems={selectedArtists}
             onSelect={setSelectedArtists}
           />
-
-          {/* LOS DEMÁS AÚN NO LOS CONECTAMOS */}
-          <TrackWidget />
+          <TrackWidget
+            selectedItems={selectedTracks}
+            onSelect={setSelectedTracks}
+          />
           <GenreWidget />
-          <DecadeWidget />
+          <DecadeWidget
+            selectedItems={selectedDecades}
+            onSelect={setSelectedDecades}
+          />
           <MoodWidget />
           <PopularityWidget />
         </div>

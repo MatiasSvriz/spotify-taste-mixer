@@ -46,6 +46,17 @@ export default function ArtistWidget({ selectedItems = [], onSelect }) {
     );
   }
 
+   function toggleArtist(artist) {
+    const exists = selectedItems.some(a => a.id === artist.id);
+
+    if (exists) {
+      onSelect(selectedItems.filter(a => a.id !== artist.id));
+      return;
+    }
+
+    onSelect([...selectedItems, artist]);
+  }
+
   return (
     <div className="bg-zinc-900 p-4 rounded border border-zinc-800 space-y-4">
       
