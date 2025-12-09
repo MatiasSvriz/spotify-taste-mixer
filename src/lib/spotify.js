@@ -46,7 +46,26 @@ export async function generatePlaylist(preferences) {
     );
   }
 
-  // 5. Eliminar duplicados y limitar a 30 canciones
+  // 5. Filtrar por mood
+  if (mood) {
+    const {
+      energy = 50,
+      valence = 50,
+      danceability = 50,
+      acousticness = 50
+    } = mood;
+
+    allTracks = allTracks.filter(t => {
+      return (
+        Math.abs((t.energy ?? 0.5) * 100 - energy) < 40 &&
+        Math.abs((t.valence ?? 0.5) * 100 - valence) < 40 &&
+        Math.abs((t.danceability ?? 0.5) * 100 - danceability) < 40 &&
+        Math.abs((t.acousticness ?? 0.5) * 100 - acousticness) < 40
+      );
+    });
+  }
+
+  // 6. Eliminar duplicados y limitar a 30 canciones
   const uniqueTracks = Array.from(
     new Map(allTracks.map(track => [track.id, track])).values()
   ).slice(0, 30);

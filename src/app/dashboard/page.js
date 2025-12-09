@@ -47,8 +47,14 @@ export default function Dashboard() {
             selectedItems={selectedDecades}
             onSelect={setSelectedDecades}
           />
-          <MoodWidget />
-          <PopularityWidget />
+          <MoodWidget
+            selectedItems={selectedMood}
+            onSelect={setSelectedMood}
+          />
+          <PopularityWidget
+            selectedItems={popularity}
+            onSelect={setPopularity}
+          />
         </div>
 
         <PlaylistDisplay />
