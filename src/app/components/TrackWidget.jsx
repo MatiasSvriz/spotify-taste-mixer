@@ -7,9 +7,7 @@ export default function TrackWidget({ selectedItems = [], onSelect }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
 
-  const MAX_TRACKS = 5;
-
-  // BÚSQUEDA CON DEBOUNCE
+  // Debounce
   useEffect(() => {
     if (!query) return setResults([]);
 
@@ -17,7 +15,7 @@ export default function TrackWidget({ selectedItems = [], onSelect }) {
     return () => clearTimeout(t);
   }, [query]);
 
-  // BUSCAR CANCIONES
+  // Buscar canciones
   async function searchTracks(q) {
     const token = getAccessToken();
     if (!token) return;
@@ -30,26 +28,31 @@ export default function TrackWidget({ selectedItems = [], onSelect }) {
     const data = await res.json();
 
     setResults(
-      (data.tracks?.items || [])
-        .slice(0, 5)
-        .map(t => ({
-          id: t.id,
-          name: t.name,
-          artist: t.artists?.[0]?.name,
-          image: t.album?.images?.[0]?.url
-        }))
+      (data.tracks?.items || []).slice(0, 5).map(t => ({
+        id: t.id,
+        name: t.name,
+        artist: t.artists?.[0]?.name,
+        image: t.album?.images?.[0]?.url
+      }))
     );
   }
 
-  function toggle(track) {
-    const exists = selectedItems.some(t => t.id === track.id);
+  function toggle(item) {
+    const isSelected = selectedItems.some(
+      (selected) => selected.id === item.id
+    );
 
-    if (exists) {
-      onSelect(selectedItems.filter(t => t.id !== track.id));
-      return;
+    let updatedList;
+
+    if (isSelected) {
+      updatedList = selectedItems.filter(
+        (selected) => selected.id !== item.id
+      );
+    } else {
+      updatedList = [...selectedItems, item];
     }
 
-    onSelect([...selectedItems, track]);
+    onSelect(updatedList);
   }
 
   return (
@@ -86,10 +89,11 @@ export default function TrackWidget({ selectedItems = [], onSelect }) {
             className="flex items-center gap-3 p-2 bg-zinc-800 rounded cursor-pointer hover:bg-zinc-700 transition"
           >
             {t.image ? (
-              <img src={t.image} className="w-10 h-10 rounded object-cover" />
+              <img src={t.image} className="w-10 h-10 rounded" />
             ) : (
               <div className="w-10 h-10 bg-zinc-700 rounded" />
             )}
+
             <div>
               <p>{t.name}</p>
               <p className="text-xs text-zinc-400">{t.artist}</p>

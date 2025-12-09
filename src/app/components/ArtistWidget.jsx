@@ -7,107 +7,92 @@ export default function ArtistWidget({ selectedItems = [], onSelect }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
 
-  const MAX_ARTISTS = 5;
-
-  // BÚSQUEDA CON DEBOUNCE
+  // Debounce
   useEffect(() => {
-    if (!query) {
-      setResults([]);
-      return;
-    }
+    if (!query) return setResults([]);
 
-    const timer = setTimeout(() => searchArtists(query), 400);
-    return () => clearTimeout(timer);
-
+    const t = setTimeout(() => searchArtists(query), 300);
+    return () => clearTimeout(t);
   }, [query]);
 
-  // BUSCAR ARTISTAS
+  // Buscar artistas
   async function searchArtists(q) {
     const token = getAccessToken();
     if (!token) return;
 
     const res = await fetch(
       `https://api.spotify.com/v1/search?type=artist&q=${encodeURIComponent(q)}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
+      { headers: { Authorization: `Bearer ${token}` } }
     );
 
     const data = await res.json();
-    
+
     setResults(
-      (data.artists?.items || [])
-        .slice(0, 5)
-        .map(a => ({
-          id: a.id,
-          name: a.name,
-          image: a.images?.[0]?.url
-        }))
+      (data.artists?.items || []).slice(0, 5).map(a => ({
+        id: a.id,
+        name: a.name,
+        image: a.images?.[0]?.url
+      }))
     );
   }
 
-   function toggleArtist(artist) {
-    const exists = selectedItems.some(a => a.id === artist.id);
+  function toggle(item) {
+    const isSelected = selectedItems.some(
+      (selected) => selected.id === item.id
+    );
 
-    if (exists) {
-      onSelect(selectedItems.filter(a => a.id !== artist.id));
-      return;
+    let updatedList;
+
+    if (isSelected) {
+      updatedList = selectedItems.filter(
+        (selected) => selected.id !== item.id
+      );
+    } else {
+      updatedList = [...selectedItems, item];
     }
 
-    onSelect([...selectedItems, artist]);
+    onSelect(updatedList);
   }
 
   return (
-    <div className="bg-zinc-900 p-4 rounded border border-zinc-800 space-y-4">
-      
-      <h2 className="text-lg font-semibold">Artistas favoritos</h2>
+    <div className="bg-zinc-900 p-4 rounded border border-zinc-800 space-y-3">
+      <h2 className="text-lg font-semibold">Artistas</h2>
 
       <input
-        type="text"
-        placeholder="Buscar artista..."
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 outline-none"
+        onChange={e => setQuery(e.target.value)}
+        placeholder="Buscar artista..."
+        className="w-full p-2 bg-zinc-800 rounded border border-zinc-700 outline-none"
       />
 
       {/* Seleccionados */}
       <div className="flex flex-wrap gap-2">
-        {selectedItems.map((artist) => (
+        {selectedItems.map(a => (
           <div
-            key={artist.id}
-            onClick={() => toggleArtist(artist)}
+            key={a.id}
+            onClick={() => toggle(a)}
             className="flex items-center gap-2 px-3 py-1 bg-green-600 rounded cursor-pointer text-sm"
           >
-            {artist.image && (
-              <img
-                src={artist.image}
-                alt={artist.name}
-                className="w-6 h-6 rounded-full object-cover"
-              />
-            )}
-            {artist.name} ✕
+            {a.image && <img src={a.image} className="w-6 h-6 rounded-full" />}
+            {a.name} ✕
           </div>
         ))}
       </div>
 
-      {/* Resultados de búsqueda */}
-      <div className="space-y-2">
-        {results.map((artist) => (
+      {/* Resultados */}
+      <div className="space-y-1">
+        {results.map(a => (
           <div
-            key={artist.id}
-            onClick={() => toggleArtist(artist)}
-            className="flex items-center gap-3 p-2 rounded bg-zinc-800 hover:bg-zinc-700 cursor-pointer transition"
+            key={a.id}
+            onClick={() => toggle(a)}
+            className="flex items-center gap-3 p-2 bg-zinc-800 rounded cursor-pointer hover:bg-zinc-700 transition"
           >
-            {artist.image ? (
-              <img
-                src={artist.image}
-                alt={artist.name}
-                className="w-10 h-10 object-cover rounded-full"
-              />
+            {a.image ? (
+              <img src={a.image} className="w-10 h-10 rounded-full" />
             ) : (
               <div className="w-10 h-10 rounded-full bg-zinc-700" />
             )}
-            <span>{artist.name}</span>
+            <p>{a.name}</p>
           </div>
         ))}
       </div>
