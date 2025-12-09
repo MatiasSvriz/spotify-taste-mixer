@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generatePlaylist } from "../../lib/spotify";
 
 import Header from "../components/Header";
@@ -14,9 +14,7 @@ import PlaylistDisplay from "../components/PlaylistDisplay";
 import FavoritesPanel from "../components/FavoritesPanel";
 
 export default function Dashboard() {
-
-  // ESTADOS NECESARIOS
-
+  
   const [selectedArtists, setSelectedArtists] = useState([]);
   const [selectedTracks, setSelectedTracks] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -72,62 +70,45 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white flex flex-col">
+
       <Header />
 
-      <FavoritesPanel
-        favorites={favorites}
-        toggleFavorite={toggleFavorite}
-      />
+      <div className="flex flex-col lg:flex-row p-6 gap-6">
 
-      <div className="p-6 space-y-8">
+        <div className="flex-1 space-y-8">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          <ArtistWidget 
-            selectedItems={selectedArtists}
-            onSelect={setSelectedArtists}
-          />
-          <TrackWidget
-            selectedItems={selectedTracks}
-            onSelect={setSelectedTracks}
-          />
-          <GenreWidget
-            selectedItems={selectedGenres}
-            onSelect={setSelectedGenres}
-            limit={5}
-          />
-          <DecadeWidget
-            selectedItems={selectedDecades}
-            onSelect={setSelectedDecades}
-          />
-          <MoodWidget
-            selectedItems={selectedMood}
-            onSelect={setSelectedMood}
-          />
-          <PopularityWidget
-            selectedItems={popularity}
-            onSelect={setPopularity}
-          />
+            <ArtistWidget selectedItems={selectedArtists} onSelect={setSelectedArtists} />
+            <TrackWidget selectedItems={selectedTracks} onSelect={setSelectedTracks} />
+
+            <GenreWidget selectedItems={selectedGenres} onSelect={setSelectedGenres} limit={5} />
+            <DecadeWidget selectedItems={selectedDecades} onSelect={setSelectedDecades} />
+
+            <MoodWidget selectedItems={selectedMood} onSelect={setSelectedMood} />
+            <PopularityWidget selectedItems={popularity} onSelect={setPopularity} />
+
+          </div>
+
+          <div className="flex justify-center">
+            <button
+              onClick={generate}
+              className="bg-green-600 hover:bg-green-500 px-6 py-3 rounded text-lg"
+            >
+              {loading ? "Generando..." : "Generar Playlist"}
+            </button>
+          </div>
+
+          <PlaylistDisplay playlist={playlist} setPlaylist={setPlaylist} 
+              onRegenerate={generate} onAddMore={addMore} favorites={favorites} toggleFavorite={toggleFavorite} />
+
         </div>
 
-         <div className="flex justify-center">
-          <button
-            onClick={generate}
-            className="bg-green-600 hover:bg-green-500 px-6 py-3 rounded text-lg"
-          >
-            {loading ? "Generando..." : "Generar Playlist"}
-          </button>
+        <div className="lg:w-80 w-full">
+          <FavoritesPanel />
         </div>
 
-        <PlaylistDisplay
-          playlist={playlist}
-          setPlaylist={setPlaylist}
-          onRegenerate={generate}
-          onAddMore={addMore}
-          favorites={favorites}
-          toggleFavorite={toggleFavorite}
-        />
       </div>
     </div>
   );
