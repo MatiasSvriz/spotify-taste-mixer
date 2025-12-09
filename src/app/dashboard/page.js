@@ -15,9 +15,8 @@ import FavoritesPanel from "../components/FavoritesPanel";
 
 export default function Dashboard() {
 
-  // ================================
   // ESTADOS NECESARIOS
-  // ================================
+
   const [selectedArtists, setSelectedArtists] = useState([]);
   const [selectedTracks, setSelectedTracks] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -27,6 +26,25 @@ export default function Dashboard() {
 
   const [playlist, setPlaylist] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [favorites, setFavorites] = useState(() => {
+    if (typeof window === "undefined") return [];
+    return JSON.parse(localStorage.getItem("favorite_tracks") || "[]");
+  });
+
+  const toggleFavorite = (track) => {
+    const alreadyFavorite = favorites.some(f => f.id === track.id);
+    let updatedFavorites;
+
+    if (alreadyFavorite) {
+      updatedFavorites = favorites.filter(f => f.id !== track.id);
+    } else {
+      updatedFavorites = [...favorites, track];
+    }
+
+    setFavorites(updatedFavorites);
+    localStorage.setItem("favorite_tracks", JSON.stringify(updatedFavorites));
+  };
 
   const generate = async () => {
     setLoading(true);
@@ -57,7 +75,10 @@ export default function Dashboard() {
     <div className="min-h-screen bg-black text-white">
       <Header />
 
-      <FavoritesPanel />
+      <FavoritesPanel
+        favorites={favorites}
+        toggleFavorite={toggleFavorite}
+      />
 
       <div className="p-6 space-y-8">
 
@@ -104,6 +125,8 @@ export default function Dashboard() {
           setPlaylist={setPlaylist}
           onRegenerate={generate}
           onAddMore={addMore}
+          favorites={favorites}
+          toggleFavorite={toggleFavorite}
         />
       </div>
     </div>

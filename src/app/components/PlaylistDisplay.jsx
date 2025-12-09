@@ -6,7 +6,9 @@ export default function PlaylistDisplay({
   playlist,
   setPlaylist,
   onRegenerate,
-  onAddMore
+  onAddMore,
+  favorites = [],
+  toggleFavorite
 }) {
   const removeTrack = (id) =>
     setPlaylist(prev => prev.filter(t => t.id !== id));
@@ -37,6 +39,8 @@ export default function PlaylistDisplay({
             key={track.id}
             track={track}
             onRemove={removeTrack}
+            onToggleFavorite={toggleFavorite}
+            isFavorite={favorites.some(f => f.id === track.id)}
           />
         ))}
 
