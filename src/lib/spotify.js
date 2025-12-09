@@ -1,5 +1,7 @@
+import { getAccessToken } from "./auth";
+
 export async function generatePlaylist(preferences) {
-  const { artists, genres, decades, popularity } = preferences;
+  const { artists, genres, decades, popularity, mood = {} } = preferences;
   const token = getAccessToken();
   let allTracks = [];
 
@@ -39,8 +41,10 @@ export async function generatePlaylist(preferences) {
   }
 
   // 4. Filtrar por popularidad
-  if (popularity) {
-    const [min, max] = popularity;
+  if (typeof popularity === "number") {
+    const min = popularity - 20;
+    const max = popularity + 20;
+
     allTracks = allTracks.filter(
       track => track.popularity >= min && track.popularity <= max
     );

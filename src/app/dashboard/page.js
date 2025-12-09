@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { generatePlaylist } from "../../lib/spotify";
 
 import Header from "../components/Header";
 import ArtistWidget from "../components/ArtistWidget";
@@ -24,6 +25,34 @@ export default function Dashboard() {
   const [selectedMood, setSelectedMood] = useState({});
   const [popularity, setPopularity] = useState([0, 100]);
 
+  const [playlist, setPlaylist] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const generate = async () => {
+    setLoading(true);
+
+    const tracks = await generatePlaylist({
+      artists: selectedArtists,
+      genres: selectedGenres,
+      decades: selectedDecades,
+      tracks: selectedTracks,
+      mood: selectedMood,
+      popularity
+    });
+
+    setPlaylist(tracks);
+    setLoading(false);
+    return tracks;
+  };
+
+  const addMore = async () => {
+    const extra = await generate();
+    const merged = [...playlist, ...extra];
+
+    const unique = Array.from(new Map(merged.map(t => [t.id, t])).values());
+    setPlaylist(unique);
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       <Header />
@@ -42,7 +71,11 @@ export default function Dashboard() {
             selectedItems={selectedTracks}
             onSelect={setSelectedTracks}
           />
-          <GenreWidget />
+          <GenreWidget
+            selectedItems={selectedGenres}
+            onSelect={setSelectedGenres}
+            limit={5}
+          />
           <DecadeWidget
             selectedItems={selectedDecades}
             onSelect={setSelectedDecades}
@@ -57,7 +90,21 @@ export default function Dashboard() {
           />
         </div>
 
-        <PlaylistDisplay />
+         <div className="flex justify-center">
+          <button
+            onClick={generate}
+            className="bg-green-600 hover:bg-green-500 px-6 py-3 rounded text-lg"
+          >
+            {loading ? "Generando..." : "Generar Playlist"}
+          </button>
+        </div>
+
+        <PlaylistDisplay
+          playlist={playlist}
+          setPlaylist={setPlaylist}
+          onRegenerate={generate}
+          onAddMore={addMore}
+        />
       </div>
     </div>
   );
