@@ -39,7 +39,7 @@ export default function GenreWidget({ selectedItems = [], onSelect, limit = 5 })
   return (
     <div className="bg-zinc-900 p-4 rounded-lg space-y-4">
 
-      <h2 className="text-lg font-semibold">Géneros Favoritos</h2>
+      <h2 className="text-lg font-semibold">Géneros</h2>
 
       <input
         className="w-full p-2 rounded bg-zinc-800"
